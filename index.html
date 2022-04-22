@@ -5,16 +5,24 @@
     <title>ColorOnMe</title>
   </head>
   <body>
+    <div id="mySidepanel" class="sidepanel">
+      <a class="closebtn" onclick="closeNav()">&times;</a>
+      <a href="#" id="clear">Clear</a>
+      <a>Color <input id="color" type="color" value="#ff0000" /></a>
+      <a>Font Size<br /><input id="size" type="range" min="0" max="30" /></a>
+    </div>
+    <button class="openbtn" onclick="openNav()">&#9776; Tools</button>
     <canvas id="draw" width="800" height="800"></canvas>
     <script>
       const canvas = document.querySelector("#draw");
+      const clearButton = document.querySelector("#clear");
+      const colorPicker = document.querySelector("#color");
+      const sizeRange = document.querySelector("#size");
       const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      ctx.strokeStyle = "#BADA55";
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
-      ctx.lineWidth = 1;
 
       let isDrawing = false;
       let lastX = 0;
@@ -24,12 +32,25 @@
 
       function draw(e) {
         if (!isDrawing) return;
-        console.log(e);
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = sizeRange.value;
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
         [lastX, lastY] = [e.offsetX, e.offsetY];
+      }
+
+      function clear() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function openNav() {
+        document.getElementById("mySidepanel").style.width = "250px";
+      }
+
+      function closeNav() {
+        document.getElementById("mySidepanel").style.width = "0";
       }
 
       canvas.addEventListener("mousedown", (e) => {
@@ -40,12 +61,64 @@
       canvas.addEventListener("mousemove", draw);
       canvas.addEventListener("mouseup", () => (isDrawing = false));
       canvas.addEventListener("mouseout", () => (isDrawing = false));
+
+      canvas.addEventListener("touchmove", draw);
+      canvas.addEventListener("touchend", () => (isDrawing = false));
+      clearButton.addEventListener("click", clear);
     </script>
 
     <style>
       html,
       body {
         margin: 0;
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      .sidepanel {
+        height: 200px;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 45px;
+        transition: 0.33s;
+      }
+
+      .sidepanel a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+      }
+
+      .sidepanel a:hover {
+        color: #f1f1f1;
+      }
+
+      .sidepanel .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+      }
+
+      .openbtn {
+        font-size: 20px;
+        cursor: pointer;
+        background-color: #111;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+      }
+
+      .openbtn:hover {
+        background-color: #444;
       }
     </style>
   </body>
